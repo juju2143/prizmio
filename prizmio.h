@@ -1,7 +1,8 @@
 /**
- * @file nspireio2.h
+ * @file prizmio.h
+ * @author  Julien "Juju" Savard <juju2143@gmail.com>
  * @author  Julian Mackeben aka compu <compujuckel@googlemail.com>
- * @version 2.0
+ * @version 0.1
  *
  * @section LICENSE
  *
@@ -22,12 +23,29 @@
  *
  * @section DESCRIPTION
  *
- * Nspire I/O 2.0 header file
+ * Prizm I/O 1.0 header file, based on Nspire I/O 2.0
  */
-#include <os.h>
+#include <stdlib.h>
 
-#ifndef NSPIREIO2_H
-#define NSPIREIO2_H
+#ifndef PRIZMIO_H
+#define PRIZMIO_H
+
+// Random stuff that haven't been defined in PrizmSDK v0.3
+// They're here until they get defined in the SDK.
+// You can safely remove the definitions if they get defined elsewhere.
+
+// stdint.h
+typedef long unsigned int size_t;
+
+// strbool.h
+typedef enum { false, true } bool;
+// Also define the uppercased variant
+typedef enum { FALSE, TRUE } BOOL;
+
+// string.h
+extern size_t strlen(const char *s);
+
+// ---
 
 /** Console structure. */
 struct nio_console

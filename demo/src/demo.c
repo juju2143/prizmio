@@ -1,5 +1,6 @@
 /**
- * @file ConsoleDemo.c
+ * @file demo.c
+ * @author  Julien "Juju" Savard <juju2143@gmail.com>
  * @author  Julian Mackeben aka compu <compujuckel@googlemail.com>
  * @version 2.0
  *
@@ -24,29 +25,41 @@
  *
  * A simple demo program showing some of the I/O functions.
  */
-#include <os.h>
-#include <nspireio2.h>
+#include <stdlib.h>
+#include <string.h>
+#include <display.h>
+#include <display_syscalls.h>
+#include <prizmio.h>
 
-int main(void)
+int main()
 {
-	if(has_colors)
-		lcd_ingray();
-	
-	wait_no_key_pressed();
+	Bdisp_AllClr_VRAM();
+	Bdisp_EnableColor(1);
 	
 	// Initialize console 1.
 	nio_console c1;
-	// 53 columns, 15 rows. 0px offset for x/y. Background color 15 (white), foreground color 0 (black)
-	nio_InitConsole(&c1,53,15,0,0,15,0);
+	// 64 columns, 14 rows. 0px offset for x/y. Background color 15 (white), foreground color 0 (black)
+	nio_InitConsole(&c1,64,14,0,0,0,15);
 	nio_DrawConsole(&c1);
 	
 	nio_console c2;
-	nio_InitConsole(&c2,53,15,0,15*8,0,15);
+	nio_InitConsole(&c2,64,13,0,14*8,0,15);
 	nio_DrawConsole(&c2);
 	
 	// Just showing printf
 	nio_printf(&c1,"%s build at %s, %s\n",__FILE__,__DATE__,__TIME__);
+	nio_printf(&c2,"16 text colors available! ");
+	int i;
+	for(i = 1; i<16; i++)
+	{
+		nio_SetColor(&c2, 0, i);
+		nio_printf(&c2, "%d ", i);
+	}
+
+	// You should call this syscall yourself so it goes faster
+	Bdisp_PutDisp_DD();
 	
+	// Press EXE to exit
 	while(1)
 	{
 		char text[100];
@@ -57,13 +70,8 @@ int main(void)
 		nio_printf(&c2,"%s\n",text);
 	}
 	
-	
-	
 	nio_CleanUp(&c1);
 	nio_CleanUp(&c2);
 	
-	if(has_colors)
-		lcd_incolor();
-		
 	return 0;
 }

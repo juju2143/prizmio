@@ -1,7 +1,8 @@
 /**
  * @file uart.c
+ * @author Julien "Juju" Savard <juju2143@gmail.com>
  * @author Julian Mackeben aka compu <compujucke@googlemail.com>
- * @version 2.0
+ * @version 0.1
  *
  * @section LICENSE
  *
@@ -24,21 +25,24 @@
  *
  * Alternative functions for serial communication, no clock on the screen.
  */
-#include <os.h>
-#include "nspireio2.h"
+#include <stdlib.h>
+#include <string.h>
+#include "prizmio.h"
 
 BOOL uart_ready(void)
 {
-	volatile unsigned *line_status_reg = is_classic ? (unsigned*)0x90020014 : (unsigned*)0x90020018;
+/*	volatile unsigned *line_status_reg = is_classic ? (unsigned*)0x90020014 : (unsigned*)0x90020018;
 	return *line_status_reg & 0b1;
+*/	return FALSE;
 }
 
 char uart_getc(void)
 {
-	volatile unsigned *line_status_reg = is_classic ? (unsigned*)0x90020014 : (unsigned*)0x90020018;
+/*	volatile unsigned *line_status_reg = is_classic ? (unsigned*)0x90020014 : (unsigned*)0x90020018;
 	volatile unsigned *recv_buffer_reg = (unsigned*)0x90020000;
 	while(!(*line_status_reg & 0b1));
 	return *recv_buffer_reg;
+*/	return '\n';
 }
 
 void uart_getline(char* dest)
@@ -58,10 +62,10 @@ void uart_getline(char* dest)
 
 void uart_putc(char c)
 {
-	volatile unsigned *line_status_reg = is_classic ? (unsigned*)0x90020014 : (unsigned*)0x90020018;
+/*	volatile unsigned *line_status_reg = is_classic ? (unsigned*)0x90020014 : (unsigned*)0x90020018;
 	volatile unsigned *xmit_holding_reg = (unsigned*)0x90020000;
 	while(!(*line_status_reg & 0b100000)); // wait for empty xmit holding reg
-		*xmit_holding_reg = c;
+		*xmit_holding_reg = c;*/
 }
 
 void uart_puts(const char *str)

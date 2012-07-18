@@ -1,7 +1,8 @@
 /**
  * @file registry.c
+ * @author  Julien "Juju" Savard <juju2143@gmail.com>
  * @author  Julian Mackeben aka compu <compujuckel@googlemail.com>
- * @version 2.0
+ * @version 0.1
  *
  * @section LICENSE
  *
@@ -24,12 +25,12 @@
  *
  * Store/Get binary data from files
  */
-#include <os.h>
-#include "nspireio2.h"
-
+#include <stdlib.h>
+#include "prizmio.h"
+	
 int reg_store(void* dataptr, size_t size, char* regpath)
 {
-	FILE* file;
+/*	FILE* file;
 	
 	file = fopen(regpath,"wb");
 	if(file == NULL)
@@ -38,11 +39,12 @@ int reg_store(void* dataptr, size_t size, char* regpath)
 	fclose(file);
 	
 	return 0;
+*/	return -1;
 }
 
 void* reg_get(char* regpath)
 {
-	struct stat fstat;
+/*	struct stat fstat;
 	void* result;
 	FILE* file;
 	
@@ -58,4 +60,5 @@ void* reg_get(char* regpath)
 	fclose(file);
 	
 	return result;
+*/	return 0;
 }

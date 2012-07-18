@@ -1,7 +1,8 @@
 /**
  * @file console.c
+ * @author  Julien "Juju" Savard <juju2143@gmail.com>
  * @author  Julian Mackeben aka compu <compujuckel@googlemail.com>
- * @version 2.0
+ * @version 0.1
  *
  * @section LICENSE
  *
@@ -24,8 +25,11 @@
  *
  * Console functions
  */
-#include "nspireio2.h"
-#include <os.h>
+#include <stdlib.h>
+#include <string.h>
+#include <keyboard.hpp>
+#include <keyboard_syscalls.h>
+#include "prizmio.h"
 
 void nio_drawstr(int offset_x, int offset_y, int x, int y, char *str, char bgColor, char textColor)
 {
@@ -38,7 +42,7 @@ void nio_drawch(int offset_x, int offset_y, int x, int y, char ch, char bgColor,
 
 void nio_load(char* path, nio_console* c)
 {
-	FILE* f = fopen(path,"rb");
+/*	FILE* f = fopen(path,"rb");
 	
 	fread(&c->cursor_x,sizeof(int),1,f);
 	fread(&c->cursor_y,sizeof(int),1,f);
@@ -60,12 +64,12 @@ void nio_load(char* path, nio_console* c)
 	fread(c->data,sizeof(char),c->max_x*c->max_y,f);
 	fread(c->color,sizeof(char),c->max_x*c->max_y,f);
 	
-	fclose(f);
+	fclose(f);*/
 }
 
 void nio_save(char* path, nio_console* c)
 {
-	FILE* f = fopen(path,"wb");
+/*	FILE* f = fopen(path,"wb");
 	
 	fwrite(&c->cursor_x,sizeof(int),1,f);
 	fwrite(&c->cursor_y,sizeof(int),1,f);
@@ -84,7 +88,14 @@ void nio_save(char* path, nio_console* c)
 	fwrite(c->data,sizeof(char),c->max_x*c->max_y,f);
 	fwrite(c->color,sizeof(char),c->max_x*c->max_y,f);
 	
-	fclose(f);
+	fclose(f);*/
+}
+
+int PRGM_GetKey(void)
+{
+  unsigned char buffer[12];
+  PRGM_GetKey_OS( buffer );
+  return ( buffer[1] & 0x0F ) * 10 + ( ( buffer[2] & 0xF0 ) >> 4 );
 }
 
 BOOL shift = FALSE;
@@ -115,12 +126,18 @@ static char shiftOrCtrlKey(char normalc, char shiftc, char ctrlc)
 }
 char nio_getch(void)
 {
+	int key = 0;
 	while(1)
 	{
-		//wait_key_pressed();
-		while (!any_key_pressed())
-			idle();
-		
+		//WaitKeyPressed();
+		//while (!any_key_pressed())
+		//	idle();
+
+		int key = PRGM_GetKey();
+
+		if(key == 31)
+			return '\n';
+/*
 		// Ctrl, Shift, Caps first
 		if(isKeyPressed(KEY_NSPIRE_CTRL))
 		{
@@ -215,7 +232,9 @@ char nio_getch(void)
 		#endif
 		if(isKeyPressed(KEY_NSPIRE_RET))		return '\n';
 		if(isKeyPressed(KEY_NSPIRE_TAB))		return '\t';
+*/
 	}
+	return 0;
 }
 
 
@@ -406,7 +425,7 @@ int nio_GetStr(nio_console* c, char* str)
 	int i = 0;
 	while(1)
 	{
-		wait_no_key_pressed();
+		//wait_no_key_pressed();
 		tmp = nio_getch();
 		if(tmp == '\n')
 		{

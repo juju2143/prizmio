@@ -1,7 +1,8 @@
 /**
  * @file screen.c
+ * @author Julien "Juju" Savard <juju2143@gmail.com>
  * @author Julian Mackeben aka compu <compujucke@googlemail.com>
- * @version 2.0
+ * @version 0.1
  *
  * @section LICENSE
  *
@@ -24,16 +25,39 @@
  *
  * Screen functions
  */
-#include <os.h>
+#include <stdlib.h>
+#include <display.h>
+#include <display_syscalls.h>
+#include <color.h>
 #include "charmap.h"
-#include "nspireio2.h"
- 
+#include "prizmio.h"
+
 void setPixel(int x, int y, unsigned int color)
 {
-	unsigned char *scr = (unsigned char *) SCREEN_BASE_ADDRESS;
-	if(x >= 0 && x < SCREEN_WIDTH && y >= 0 && y < SCREEN_HEIGHT)
+	unsigned short *scr = (unsigned short *) 0xA8000000;
+	unsigned short palette[16] = { 
+		COLOR_BLACK,
+		COLOR_DARKRED,
+		COLOR_GREEN,
+		COLOR_OLIVE,
+		COLOR_DARKBLUE,
+		COLOR_DARKMAGENTA,
+		COLOR_DARKCYAN,
+		COLOR_GRAY,
+		COLOR_DARKGRAY,
+		COLOR_RED,
+		COLOR_LIME,
+		COLOR_YELLOW,
+		COLOR_BLUE,
+		COLOR_MAGENTA,
+		COLOR_CYAN,
+		COLOR_WHITE
+	};
+	if(x >= 0 && x < LCD_WIDTH_PX && y >= 0 && y < LCD_HEIGHT_PX)
 	{
-		scr[y*SCREEN_WIDTH/2+x/2]=x&1? (scr[y*SCREEN_WIDTH/2+x/2]&0xF0)+color : (scr[y*SCREEN_WIDTH/2+x/2]&0x0F)+(color<< 4);
+		//scr[y*SCREEN_WIDTH/2+x/2]=x&1? (scr[y*SCREEN_WIDTH/2+x/2]&0xF0)+color : (scr[y*SCREEN_WIDTH/2+x/2]&0x0F)+(color<< 4);
+		
+		scr[y*LCD_WIDTH_PX+x] = palette[color];
 	}
 }
 
@@ -60,7 +84,7 @@ void putStr(int x, int y, char* str, int bgColor, int textColor)
 	{
 		putChar(x, y, str[i], bgColor, textColor);
 		x += CHAR_WIDTH;
-		if (x >= SCREEN_WIDTH-CHAR_WIDTH)
+		if (x >= LCD_WIDTH_PX-CHAR_WIDTH)
 		{
 			stop=1;
 		}

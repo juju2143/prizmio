@@ -1,0 +1,34 @@
++---------------------+
+|    Prizm I/O 0.1    |
++---------------------+
+
+Installation
+------------
+To install it, just specify the FXCGSDK environment variable
+then run "make". If not specified, the installation directory
+will be "../../".
+
+Usage
+-----
+Add "-lprizmio" to LDFLAGS in your Makefile and include
+"prizmio.h" in your code.
+
+Prizm I/O 0.1 is compatible with Nspire I/O 2.0 so you can make
+programs that works on both the Nspire and the Prizm (with some
+#ifdef abuse).
+
+To speed up the drawing, you should call the Bdisp_PutDisp_DD()
+syscall yourself to draw the VRAM onscreen.
+
+Documentation
+-------------
+An auto-generated documentation can be found in the "doc/html"
+directory, just open "index.html" (if something is unclear,
+please contact me and I will try to help you ;)
+The code of the demo application can be found in "src/demo".
+
+Contact
+-------
+Julien "Juju" Savard
+E-Mail: juju2143@gmail.com
+Discussion topic: http://www.omnimaga.org/index.php?topic=14001.0
