@@ -4,6 +4,7 @@
 
 Installation
 ------------
+Compiles with PrizmSDK 0.3, available on Cemetech.
 To install it, just specify the FXCGSDK environment variable
 then run "make". If not specified, the installation directory
 will be "../../".
