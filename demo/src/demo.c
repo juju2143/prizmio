@@ -55,9 +55,10 @@ int main()
 		nio_SetColor(&c2, 0, i);
 		nio_printf(&c2, "%d ", i);
 	}
+	nio_printf(&c2,"\n");
 
-	// You should call this syscall yourself so it goes faster
-	Bdisp_PutDisp_DD();
+	// You should call this syscall yourself so it goes faster... or not.
+	//Bdisp_PutDisp_DD();
 	
 	// Press EXE to exit
 	while(1)
@@ -68,6 +69,7 @@ int main()
 			break;
 		// Write the text into 2nd console
 		nio_printf(&c2,"%s\n",text);
+		//Bdisp_PutDisp_DD();
 	}
 	
 	nio_CleanUp(&c1);

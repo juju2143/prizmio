@@ -28,8 +28,40 @@
 #include <stdlib.h>
 #include <string.h>
 #include <keyboard.hpp>
-#include <keyboard_syscalls.h>
 #include "prizmio.h"
+
+const unsigned short* keyboard_register = (unsigned short*)0xA44B0000;
+unsigned short lastkey[8];
+unsigned short holdkey[8];
+
+void keyupdate(void)
+{
+	memcpy(holdkey, lastkey, sizeof(unsigned short)*8);
+	memcpy(lastkey, keyboard_register, sizeof(unsigned short)*8);
+}
+int keydownlast(int basic_keycode)
+{
+	int row, col, word, bit; 
+	row = basic_keycode%10; 
+	col = basic_keycode/10-1; 
+	word = row>>1; 
+	bit = col + 8*(row&1); 
+	return (0 != (lastkey[word] & 1<<bit)); 
+}
+int keydownhold(int basic_keycode)
+{
+	int row, col, word, bit; 
+	row = basic_keycode%10; 
+	col = basic_keycode/10-1; 
+	word = row>>1; 
+	bit = col + 8*(row&1); 
+	return (0 != (holdkey[word] & 1<<bit)); 
+}
+
+int isKeyPressed(int basic_keycode)
+{
+	return (keydownlast(basic_keycode) && !keydownhold(basic_keycode));
+}
 
 void nio_drawstr(int offset_x, int offset_y, int x, int y, char *str, char bgColor, char textColor)
 {
@@ -91,13 +123,6 @@ void nio_save(char* path, nio_console* c)
 	fclose(f);*/
 }
 
-int PRGM_GetKey(void)
-{
-  unsigned char buffer[12];
-  PRGM_GetKey_OS( buffer );
-  return ( buffer[1] & 0x0F ) * 10 + ( ( buffer[2] & 0xF0 ) >> 4 );
-}
-
 BOOL shift = FALSE;
 BOOL caps = FALSE;
 BOOL ctrl = FALSE;
@@ -129,22 +154,15 @@ char nio_getch(void)
 	int key = 0;
 	while(1)
 	{
-		//WaitKeyPressed();
-		//while (!any_key_pressed())
-		//	idle();
+		keyupdate();
 
-		int key = PRGM_GetKey();
-
-		if(key == 31)
-			return '\n';
-/*
 		// Ctrl, Shift, Caps first
-		if(isKeyPressed(KEY_NSPIRE_CTRL))
+		if(isKeyPressed(KEY_CTRL_VARS))
 		{
 			if(ctrl) ctrl = FALSE;
 			else ctrl = TRUE;
 		}
-		if(isKeyPressed(KEY_NSPIRE_SHIFT) || isKeyPressed(KEY_NSPIRE_CAPS))
+		if(isKeyPressed(KEY_CTRL_OPTN))
 		{
 			if(ctrl)
 			{
@@ -156,89 +174,87 @@ char nio_getch(void)
 			else if(shift) shift = FALSE;
 			else shift = TRUE;
 		}
-		
-		if(isKeyPressed(KEY_NSPIRE_ESC)) return 0;
+
+		if(isKeyPressed(KEY_CTRL_MENU)) return 0;
+		if(isKeyPressed(KEY_CTRL_EXIT)) return 0;
+		if(isKeyPressed(KEY_CTRL_QUIT)) return 0;
 		
 		// Characters
-		if(isKeyPressed(KEY_NSPIRE_A)) return shiftKey('a','A');
-		if(isKeyPressed(KEY_NSPIRE_B)) return shiftKey('b','B');
-		if(isKeyPressed(KEY_NSPIRE_C)) return shiftKey('c','C');
-		if(isKeyPressed(KEY_NSPIRE_D)) return shiftKey('d','D');
-		if(isKeyPressed(KEY_NSPIRE_E)) return shiftKey('e','E');
-		if(isKeyPressed(KEY_NSPIRE_F)) return shiftKey('f','F');
-		if(isKeyPressed(KEY_NSPIRE_G)) return shiftKey('g','G');
-		if(isKeyPressed(KEY_NSPIRE_H)) return shiftKey('h','H');
-		if(isKeyPressed(KEY_NSPIRE_I)) return shiftKey('i','I');
-		if(isKeyPressed(KEY_NSPIRE_J)) return shiftKey('j','J');
-		if(isKeyPressed(KEY_NSPIRE_K)) return shiftKey('k','K');
-		if(isKeyPressed(KEY_NSPIRE_L)) return shiftKey('l','L');
-		if(isKeyPressed(KEY_NSPIRE_M)) return shiftKey('m','M');
-		if(isKeyPressed(KEY_NSPIRE_N)) return shiftKey('n','N');
-		if(isKeyPressed(KEY_NSPIRE_O)) return shiftKey('o','O');
-		if(isKeyPressed(KEY_NSPIRE_P)) return shiftKey('p','P');
-		if(isKeyPressed(KEY_NSPIRE_Q)) return shiftKey('q','Q');
-		if(isKeyPressed(KEY_NSPIRE_R)) return shiftKey('r','R');
-		if(isKeyPressed(KEY_NSPIRE_S)) return shiftKey('s','S');
-		if(isKeyPressed(KEY_NSPIRE_T)) return shiftKey('t','T');
-		if(isKeyPressed(KEY_NSPIRE_U)) return shiftKey('u','U');
-		if(isKeyPressed(KEY_NSPIRE_V)) return shiftKey('v','V');
-		if(isKeyPressed(KEY_NSPIRE_W)) return shiftKey('w','W');
-		if(isKeyPressed(KEY_NSPIRE_X)) return shiftKey('x','X');
-		if(isKeyPressed(KEY_NSPIRE_Y)) return shiftKey('y','Y');
-		if(isKeyPressed(KEY_NSPIRE_Z)) return shiftKey('z','Z');
+		if(isKeyPressed(KEY_CHAR_A)) return shiftKey('a','A');
+		if(isKeyPressed(KEY_CHAR_B)) return shiftKey('b','B');
+		if(isKeyPressed(KEY_CHAR_C)) return shiftKey('c','C');
+		if(isKeyPressed(KEY_CHAR_D)) return shiftKey('d','D');
+		if(isKeyPressed(KEY_CHAR_E)) return shiftKey('e','E');
+		if(isKeyPressed(KEY_CHAR_F)) return shiftKey('f','F');
+		if(isKeyPressed(KEY_CHAR_G)) return shiftKey('g','G');
+		if(isKeyPressed(KEY_CHAR_H)) return shiftKey('h','H');
+		if(isKeyPressed(KEY_CHAR_I)) return shiftKey('i','I');
+		if(isKeyPressed(KEY_CHAR_J)) return shiftKey('j','J');
+		if(isKeyPressed(KEY_CHAR_K)) return shiftKey('k','K');
+		if(isKeyPressed(KEY_CHAR_L)) return shiftKey('l','L');
+		if(isKeyPressed(KEY_CHAR_M)) return shiftKey('m','M');
+		if(isKeyPressed(KEY_CHAR_N)) return shiftKey('n','N');
+		if(isKeyPressed(KEY_CHAR_O)) return shiftKey('o','O');
+		if(isKeyPressed(KEY_CHAR_P)) return shiftKey('p','P');
+		if(isKeyPressed(KEY_CHAR_Q)) return shiftKey('q','Q');
+		if(isKeyPressed(KEY_CHAR_R)) return shiftKey('r','R');
+		if(isKeyPressed(KEY_CHAR_S)) return shiftKey('s','S');
+		if(isKeyPressed(KEY_CHAR_T)) return shiftKey('t','T');
+		if(isKeyPressed(KEY_CHAR_U)) return shiftKey('u','U');
+		if(isKeyPressed(KEY_CHAR_V)) return shiftKey('v','V');
+		if(isKeyPressed(KEY_CHAR_W)) return shiftKey('w','W');
+		if(isKeyPressed(KEY_CHAR_X)) return shiftKey('x','X');
+		if(isKeyPressed(KEY_CHAR_Y)) return shiftKey('y','Y');
+		if(isKeyPressed(KEY_CHAR_Z)) return shiftKey('z','Z');
 		
 		// Numbers
-		if(isKeyPressed(KEY_NSPIRE_0)) return '0';
-		if(isKeyPressed(KEY_NSPIRE_1)) return '1';
-		if(isKeyPressed(KEY_NSPIRE_2)) return '2';
-		if(isKeyPressed(KEY_NSPIRE_3)) return '3';
-		if(isKeyPressed(KEY_NSPIRE_4)) return '4';
-		if(isKeyPressed(KEY_NSPIRE_5)) return '5';
-		if(isKeyPressed(KEY_NSPIRE_6)) return '6';
-		if(isKeyPressed(KEY_NSPIRE_7)) return '7';
-		if(isKeyPressed(KEY_NSPIRE_8)) return '8';
-		if(isKeyPressed(KEY_NSPIRE_9)) return '9';
+		if(isKeyPressed(KEY_CHAR_0)) return '0';
+		if(isKeyPressed(KEY_CHAR_1)) return '1';
+		if(isKeyPressed(KEY_CHAR_2)) return '2';
+		if(isKeyPressed(KEY_CHAR_3)) return '3';
+		if(isKeyPressed(KEY_CHAR_4)) return '4';
+		if(isKeyPressed(KEY_CHAR_5)) return '5';
+		if(isKeyPressed(KEY_CHAR_6)) return '6';
+		if(isKeyPressed(KEY_CHAR_7)) return '7';
+		if(isKeyPressed(KEY_CHAR_8)) return '8';
+		if(isKeyPressed(KEY_CHAR_9)) return '9';
 		
 		// Symbols
-		if(isKeyPressed(KEY_NSPIRE_COMMA))		return shiftKey(',',';');
-		if(isKeyPressed(KEY_NSPIRE_PERIOD)) 	return shiftKey('.',':');
-		if(isKeyPressed(KEY_NSPIRE_COLON))		return ':';
-		if(isKeyPressed(KEY_NSPIRE_LP))			return shiftOrCtrlKey('(','[',']');
-		if(isKeyPressed(KEY_NSPIRE_RP))			return shiftOrCtrlKey(')','{','}');
-		if(isKeyPressed(KEY_NSPIRE_SPACE))		return shiftKey(' ','_');
-		if(isKeyPressed(KEY_NSPIRE_DIVIDE))		return shiftKey('/','\\');
-		if(isKeyPressed(KEY_NSPIRE_MULTIPLY))	return shiftKey('*','\"');
-		if(isKeyPressed(KEY_NSPIRE_MINUS))		return shiftKey('-','_');
-		if(isKeyPressed(KEY_NSPIRE_NEGATIVE))	return shiftKey('-','_');
-		if(isKeyPressed(KEY_NSPIRE_PLUS))		return '+';
-		if(isKeyPressed(KEY_NSPIRE_EQU))		return '=';
-		if(isKeyPressed(KEY_NSPIRE_LTHAN))		return '<';
-		if(isKeyPressed(KEY_NSPIRE_GTHAN))		return '>';
-		if(isKeyPressed(KEY_NSPIRE_QUOTE))		return '\"';
-		if(isKeyPressed(KEY_NSPIRE_APOSTROPHE))	return '\'';
-		if(isKeyPressed(KEY_NSPIRE_QUES))		return shiftKey('?','!');
-		if(isKeyPressed(KEY_NSPIRE_QUESEXCL))	return shiftKey('?','!');
-		if(isKeyPressed(KEY_NSPIRE_BAR))		return '|';
-		if(isKeyPressed(KEY_NSPIRE_EXP))		return '^';
-		if(isKeyPressed(KEY_NSPIRE_ENTER))		return shiftKey('\n','~');
-		if(isKeyPressed(KEY_NSPIRE_SQU))		return '²';
+		if(isKeyPressed(KEY_CHAR_COMMA))		return shiftKey(',',';');
+		if(isKeyPressed(KEY_CHAR_DP)) 	return shiftKey('.',':');
+		//if(isKeyPressed(KEY_CHAR_COLON))		return ':';
+		if(isKeyPressed(KEY_CHAR_LPAR))			return '(';
+		if(isKeyPressed(KEY_CHAR_RPAR))			return ')';
+		if(isKeyPressed(KEY_CHAR_SPACE))		return shiftKey(' ','_');
+		if(isKeyPressed(KEY_CHAR_DIV))		return shiftKey('/','\\');
+		if(isKeyPressed(KEY_CHAR_MULT))	return shiftKey('*','\"');
+		if(isKeyPressed(KEY_CHAR_MINUS))		return shiftKey('-','_');
+		if(isKeyPressed(KEY_CHAR_PMINUS))	return shiftKey('-','_');
+		if(isKeyPressed(KEY_CHAR_PLUS))		return '+';
+		if(isKeyPressed(KEY_CHAR_EQUAL))		return '=';
+		//if(isKeyPressed(KEY_CHAR_LTHAN))		return '<';
+		//if(isKeyPressed(KEY_CHAR_GTHAN))		return '>';
+		if(isKeyPressed(KEY_CHAR_LBRCKT))		return '[';
+		if(isKeyPressed(KEY_CHAR_RBRCKT))		return ']';
+		if(isKeyPressed(KEY_CHAR_LBRACE))		return '{';
+		if(isKeyPressed(KEY_CHAR_RBRACE))		return '}';
+		if(isKeyPressed(KEY_CHAR_DQUATE))		return '\"';
+		//if(isKeyPressed(KEY_CHAR_APOSTROPHE))	return '\'';
+		//if(isKeyPressed(KEY_CHAR_QUES))		return shiftKey('?','!');
+		//if(isKeyPressed(KEY_CHAR_QUESEXCL))	return shiftKey('?','!');
+		if(isKeyPressed(KEY_CHAR_ANS))		return '|';
+		if(isKeyPressed(KEY_CHAR_EXP))		return '^';
+		if(isKeyPressed(KEY_CTRL_EXE))		return shiftKey('\n','~');
+		if(isKeyPressed(KEY_CHAR_SQUARE))		return '²';
 		
 		// Special chars
-		#ifdef KEY_NSPIRE_CLEAR // Keep better Ndless 2 compatibility (clickpad)
-		if(isKeyPressed(KEY_NSPIRE_DEL)
-		 ||isKeyPressed(KEY_NSPIRE_CLEAR))		return '\b';
-		#else
-		if(isKeyPressed(KEY_NSPIRE_DEL))		return '\b';
-		#endif
-		if(isKeyPressed(KEY_NSPIRE_RET))		return '\n';
-		if(isKeyPressed(KEY_NSPIRE_TAB))		return '\t';
-*/
+		if(isKeyPressed(KEY_CHAR_CR))		return '\n';
+		if(isKeyPressed(KEY_CTRL_DEL))		return '\b';
+		if(isKeyPressed(KEY_CHAR_STORE))		return '\t';
+
 	}
 	return 0;
 }
-
-
-
 
 void nio_InitConsole(nio_console* c, int size_x, int size_y, int offset_x, int offset_y, char background_color, char foreground_color)
 {

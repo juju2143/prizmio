@@ -57,7 +57,8 @@ void setPixel(int x, int y, unsigned int color)
 	{
 		//scr[y*SCREEN_WIDTH/2+x/2]=x&1? (scr[y*SCREEN_WIDTH/2+x/2]&0xF0)+color : (scr[y*SCREEN_WIDTH/2+x/2]&0x0F)+(color<< 4);
 		
-		scr[y*LCD_WIDTH_PX+x] = palette[color];
+		//scr[y*LCD_WIDTH_PX+x] = palette[color];
+		Bdisp_SetPoint_DD(x, y, palette[color]);
 	}
 }
 
