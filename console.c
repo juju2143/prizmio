@@ -126,6 +126,7 @@ void nio_save(char* path, nio_console* c)
 BOOL shift = FALSE;
 BOOL caps = FALSE;
 BOOL ctrl = FALSE;
+BOOL optn = FALSE;
 static char shiftKey(char normalc, char shiftc)
 {
 	if(shift || caps) 
@@ -149,6 +150,11 @@ static char shiftOrCtrlKey(char normalc, char shiftc, char ctrlc)
 	}
 	else return normalc;
 }
+static char lowerOrUpperKey(char lowerc, char upperc)
+{
+	if(optn) return upperc;
+	else return lowerc;
+}
 char nio_getch(void)
 {
 	int key = 0;
@@ -157,12 +163,17 @@ char nio_getch(void)
 		keyupdate();
 
 		// Ctrl, Shift, Caps first
-		if(isKeyPressed(KEY_CTRL_VARS))
+		if(isKeyPressed(KEY_PRGM_SHIFT))
 		{
 			if(ctrl) ctrl = FALSE;
 			else ctrl = TRUE;
 		}
-		if(isKeyPressed(KEY_CTRL_OPTN))
+		if(isKeyPressed(68)) // OPTN
+		{
+			if(optn) optn = FALSE;
+			else optn = TRUE;
+		}
+		if(isKeyPressed(KEY_PRGM_ALPHA))
 		{
 			if(ctrl)
 			{
@@ -175,51 +186,52 @@ char nio_getch(void)
 			else shift = TRUE;
 		}
 
-		if(isKeyPressed(KEY_CTRL_MENU)) return 0;
-		if(isKeyPressed(KEY_CTRL_EXIT)) return 0;
-		if(isKeyPressed(KEY_CTRL_QUIT)) return 0;
+		if(isKeyPressed(KEY_PRGM_MENU)) return 0;
+		if(isKeyPressed(KEY_PRGM_EXIT)) return 0;
+		if(isKeyPressed(KEY_PRGM_ACON)) return 0;
+
+		if(isKeyPressed(67)) return shiftKey('`', '$');
+		if(isKeyPressed(57)) return shiftKey('^', '#');
 		
 		// Characters
-		if(isKeyPressed(KEY_CHAR_A)) return shiftKey('a','A');
-		if(isKeyPressed(KEY_CHAR_B)) return shiftKey('b','B');
-		if(isKeyPressed(KEY_CHAR_C)) return shiftKey('c','C');
-		if(isKeyPressed(KEY_CHAR_D)) return shiftKey('d','D');
-		if(isKeyPressed(KEY_CHAR_E)) return shiftKey('e','E');
-		if(isKeyPressed(KEY_CHAR_F)) return shiftKey('f','F');
-		if(isKeyPressed(KEY_CHAR_G)) return shiftKey('g','G');
-		if(isKeyPressed(KEY_CHAR_H)) return shiftKey('h','H');
-		if(isKeyPressed(KEY_CHAR_I)) return shiftKey('i','I');
-		if(isKeyPressed(KEY_CHAR_J)) return shiftKey('j','J');
-		if(isKeyPressed(KEY_CHAR_K)) return shiftKey('k','K');
-		if(isKeyPressed(KEY_CHAR_L)) return shiftKey('l','L');
-		if(isKeyPressed(KEY_CHAR_M)) return shiftKey('m','M');
-		if(isKeyPressed(KEY_CHAR_N)) return shiftKey('n','N');
-		if(isKeyPressed(KEY_CHAR_O)) return shiftKey('o','O');
-		if(isKeyPressed(KEY_CHAR_P)) return shiftKey('p','P');
-		if(isKeyPressed(KEY_CHAR_Q)) return shiftKey('q','Q');
-		if(isKeyPressed(KEY_CHAR_R)) return shiftKey('r','R');
-		if(isKeyPressed(KEY_CHAR_S)) return shiftKey('s','S');
-		if(isKeyPressed(KEY_CHAR_T)) return shiftKey('t','T');
-		if(isKeyPressed(KEY_CHAR_U)) return shiftKey('u','U');
-		if(isKeyPressed(KEY_CHAR_V)) return shiftKey('v','V');
-		if(isKeyPressed(KEY_CHAR_W)) return shiftKey('w','W');
-		if(isKeyPressed(KEY_CHAR_X)) return shiftKey('x','X');
-		if(isKeyPressed(KEY_CHAR_Y)) return shiftKey('y','Y');
-		if(isKeyPressed(KEY_CHAR_Z)) return shiftKey('z','Z');
+		if(isKeyPressed(76)) return lowerOrUpperKey('a', 'A');
+		if(isKeyPressed(66)) return lowerOrUpperKey('b', 'B');
+		if(isKeyPressed(56)) return lowerOrUpperKey('c', 'C');
+		if(isKeyPressed(46)) return lowerOrUpperKey('d', 'D');
+		if(isKeyPressed(36)) return lowerOrUpperKey('e', 'E');
+		if(isKeyPressed(26)) return lowerOrUpperKey('f', 'F');
+
+		if(isKeyPressed(75)) return shiftKey('<', lowerOrUpperKey('g', 'G'));
+		if(isKeyPressed(65)) return shiftKey('>', lowerOrUpperKey('h', 'H'));
+		if(isKeyPressed(55)) return shiftKey('(', lowerOrUpperKey('i', 'I'));
+		if(isKeyPressed(45)) return shiftKey(')', lowerOrUpperKey('j', 'J'));
+		if(isKeyPressed(35)) return shiftKey(',', lowerOrUpperKey('k', 'K'));
+		if(isKeyPressed(25)) return shiftKey('\t', lowerOrUpperKey('l', 'L'));
+
+		if(isKeyPressed(74)) return shiftKey('7', lowerOrUpperKey('m', 'M'));
+		if(isKeyPressed(64)) return shiftKey('8', lowerOrUpperKey('n', 'N'));
+		if(isKeyPressed(54)) return shiftKey('9', lowerOrUpperKey('o', 'O'));
+		if(isKeyPressed(44)) return '\b';
+
+		if(isKeyPressed(73)) return shiftKey('4', lowerOrUpperKey('p', 'P'));
+		if(isKeyPressed(63)) return shiftKey('5', lowerOrUpperKey('q', 'Q'));
+		if(isKeyPressed(53)) return shiftKey('6', lowerOrUpperKey('r', 'R'));
+		if(isKeyPressed(43)) return shiftOrCtrlKey('*', lowerOrUpperKey('s', 'S'), '{');
+		if(isKeyPressed(33)) return shiftOrCtrlKey('/', lowerOrUpperKey('t', 'T'), '}');
+
+		if(isKeyPressed(72)) return shiftKey('1', lowerOrUpperKey('u', 'U'));
+		if(isKeyPressed(62)) return shiftKey('2', lowerOrUpperKey('v', 'V'));
+		if(isKeyPressed(52)) return shiftKey('3', lowerOrUpperKey('w', 'W'));
+		if(isKeyPressed(42)) return shiftOrCtrlKey('+', lowerOrUpperKey('x', 'X'), '[');
+		if(isKeyPressed(32)) return shiftOrCtrlKey('-', lowerOrUpperKey('y', 'Y'), ']');
+
+		if(isKeyPressed(71)) return shiftOrCtrlKey('0', lowerOrUpperKey('z', 'Z'), '|');
+		if(isKeyPressed(61)) return shiftOrCtrlKey('.', ' ', '=');
+		if(isKeyPressed(51)) return shiftOrCtrlKey('_', '"', '?');
+		if(isKeyPressed(41)) return shiftOrCtrlKey('~', ':', '!');
+		if(isKeyPressed(31)) return '\n';
 		
-		// Numbers
-		if(isKeyPressed(KEY_CHAR_0)) return '0';
-		if(isKeyPressed(KEY_CHAR_1)) return '1';
-		if(isKeyPressed(KEY_CHAR_2)) return '2';
-		if(isKeyPressed(KEY_CHAR_3)) return '3';
-		if(isKeyPressed(KEY_CHAR_4)) return '4';
-		if(isKeyPressed(KEY_CHAR_5)) return '5';
-		if(isKeyPressed(KEY_CHAR_6)) return '6';
-		if(isKeyPressed(KEY_CHAR_7)) return '7';
-		if(isKeyPressed(KEY_CHAR_8)) return '8';
-		if(isKeyPressed(KEY_CHAR_9)) return '9';
-		
-		// Symbols
+/*		// Symbols
 		if(isKeyPressed(KEY_CHAR_COMMA))		return shiftKey(',',';');
 		if(isKeyPressed(KEY_CHAR_DP)) 	return shiftKey('.',':');
 		//if(isKeyPressed(KEY_CHAR_COLON))		return ':';
@@ -251,7 +263,7 @@ char nio_getch(void)
 		if(isKeyPressed(KEY_CHAR_CR))		return '\n';
 		if(isKeyPressed(KEY_CTRL_DEL))		return '\b';
 		if(isKeyPressed(KEY_CHAR_STORE))		return '\t';
-
+*/
 	}
 	return 0;
 }
