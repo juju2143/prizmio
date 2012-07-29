@@ -32,33 +32,41 @@
 #include "charmap.h"
 #include "prizmio.h"
 
+unsigned short *scr = (unsigned short *) 0xA8000000;
+unsigned short palette[16] = { 
+	COLOR_BLACK,
+	COLOR_DARKRED,
+	COLOR_GREEN,
+	COLOR_OLIVE,
+	COLOR_DARKBLUE,
+	COLOR_DARKMAGENTA,
+	COLOR_DARKCYAN,
+	COLOR_GRAY,
+	COLOR_DARKGRAY,
+	COLOR_RED,
+	COLOR_LIME,
+	COLOR_YELLOW,
+	COLOR_BLUE,
+	COLOR_MAGENTA,
+	COLOR_CYAN,
+	COLOR_WHITE
+};
+
+
 void setPixel(int x, int y, unsigned int color)
 {
-	unsigned short *scr = (unsigned short *) 0xA8000000;
-	unsigned short palette[16] = { 
-		COLOR_BLACK,
-		COLOR_DARKRED,
-		COLOR_GREEN,
-		COLOR_OLIVE,
-		COLOR_DARKBLUE,
-		COLOR_DARKMAGENTA,
-		COLOR_DARKCYAN,
-		COLOR_GRAY,
-		COLOR_DARKGRAY,
-		COLOR_RED,
-		COLOR_LIME,
-		COLOR_YELLOW,
-		COLOR_BLUE,
-		COLOR_MAGENTA,
-		COLOR_CYAN,
-		COLOR_WHITE
-	};
 	if(x >= 0 && x < LCD_WIDTH_PX && y >= 0 && y < LCD_HEIGHT_PX)
 	{
-		//scr[y*SCREEN_WIDTH/2+x/2]=x&1? (scr[y*SCREEN_WIDTH/2+x/2]&0xF0)+color : (scr[y*SCREEN_WIDTH/2+x/2]&0x0F)+(color<< 4);
-		
-		//scr[y*LCD_WIDTH_PX+x] = palette[color];
+		scr[y*LCD_WIDTH_PX+x] = palette[color];
 		Bdisp_SetPoint_DD(x, y, palette[color]);
+	}
+}
+
+void setPixelVRAM(int x, int y, unsigned int color)
+{
+	if(x >= 0 && x < LCD_WIDTH_PX && y >= 0 && y < LCD_HEIGHT_PX)
+	{
+		scr[y*LCD_WIDTH_PX+x] = palette[color];
 	}
 }
 
@@ -84,6 +92,35 @@ void putStr(int x, int y, char* str, int bgColor, int textColor)
 	for (i = 0; i < l && !stop; i++)
 	{
 		putChar(x, y, str[i], bgColor, textColor);
+		x += CHAR_WIDTH;
+		if (x >= LCD_WIDTH_PX-CHAR_WIDTH)
+		{
+			stop=1;
+		}
+	}
+}
+void putCharVRAM(int x, int y, char ch, int bgColor, int textColor)
+{
+	int i, j, pixelOn;
+	for(i = 0; i < CHAR_WIDTH; i++)
+	{
+		for(j = CHAR_HEIGHT; j > 0; j--)
+		{
+			pixelOn = MBCharSet8x6_definition[(unsigned char)ch][i] << j ;
+			pixelOn = pixelOn & 0x80 ;
+			if (pixelOn) 		setPixelVRAM(x+i,y+CHAR_HEIGHT-j,textColor);
+			else if(!pixelOn) 	setPixelVRAM(x+i,y+CHAR_HEIGHT-j,bgColor);
+		}
+	}
+}
+void putStrVRAM(int x, int y, char* str, int bgColor, int textColor)
+{
+	int l = strlen(str);
+	int i;
+	int stop=0;
+	for (i = 0; i < l && !stop; i++)
+	{
+		putCharVRAM(x, y, str[i], bgColor, textColor);
 		x += CHAR_WIDTH;
 		if (x >= LCD_WIDTH_PX-CHAR_WIDTH)
 		{

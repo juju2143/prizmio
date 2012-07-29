@@ -71,6 +71,14 @@ void nio_drawch(int offset_x, int offset_y, int x, int y, char ch, char bgColor,
 {
 	putChar(offset_x+x*6,offset_y+y*8,ch,bgColor,textColor);
 }
+void nio_drawstrVRAM(int offset_x, int offset_y, int x, int y, char *str, char bgColor, char textColor)
+{
+	putStrVRAM(offset_x+x*6,offset_y+y*8,str,bgColor,textColor);
+}
+void nio_drawchVRAM(int offset_x, int offset_y, int x, int y, char ch, char bgColor, char textColor)
+{
+	putCharVRAM(offset_x+x*6,offset_y+y*8,ch,bgColor,textColor);
+}
 
 void nio_load(char* path, nio_console* c)
 {
@@ -221,7 +229,7 @@ char nio_getch(void)
 
 		if(isKeyPressed(72)) return shiftKey('1', lowerOrUpperKey('u', 'U'));
 		if(isKeyPressed(62)) return shiftKey('2', lowerOrUpperKey('v', 'V'));
-		if(isKeyPressed(52)) return shiftKey('3', lowerOrUpperKey('w', 'W'));
+		if(isKeyPressed(52)) return shiftOrCtrlKey('3', lowerOrUpperKey('w', 'W'), ';');
 		if(isKeyPressed(42)) return shiftOrCtrlKey('+', lowerOrUpperKey('x', 'X'), '[');
 		if(isKeyPressed(32)) return shiftOrCtrlKey('-', lowerOrUpperKey('y', 'Y'), ']');
 
@@ -291,9 +299,10 @@ void nio_DrawConsole(nio_console* c)
 	{
 		for(col = 0; col < c->max_x; col++)
 		{
-			nio_DrawChar(c,col,row);
+			nio_DrawCharVRAM(c,col,row);
 		}
 	}
+	Bdisp_PutDisp_DD();
 }
 
 void nio_Clear(nio_console* c)
@@ -337,6 +346,17 @@ void nio_DrawChar(nio_console* c, int pos_x, int pos_y)
 	char foreground_color = color & 0x0F;
 	
 	nio_drawch(c->offset_x, c->offset_y, pos_x, pos_y, ch == 0 ? ' ' : ch, background_color, foreground_color);
+}
+
+void nio_DrawCharVRAM(nio_console* c, int pos_x, int pos_y)
+{
+	char ch = c->data[pos_y*c->max_x+pos_x];
+	char color = c->color[pos_y*c->max_x+pos_x];
+	
+	char background_color = (color & 0xF0) >> 4;
+	char foreground_color = color & 0x0F;
+	
+	nio_drawchVRAM(c->offset_x, c->offset_y, pos_x, pos_y, ch == 0 ? ' ' : ch, background_color, foreground_color);
 }
 
 void nio_SetChar(nio_console* c, char ch, int pos_x, int pos_y)

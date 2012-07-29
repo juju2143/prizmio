@@ -83,6 +83,13 @@ void nio_save(char* path, nio_console* c);
 */
 void setPixel(int x, int y, unsigned int color);
 
+/** Draws a pixel to the VRAM.
+	@param x X coordinate
+	@param y Y coordinate
+	@param color Pixel color
+*/
+void setPixelVRAM(int x, int y, unsigned int color);
+
 /** Draws a char to the screen using the charmap.
 	@param x X coordinate
 	@param y Y coordinate
@@ -92,6 +99,15 @@ void setPixel(int x, int y, unsigned int color);
 */
 void putChar(int x, int y, char ch, int bgColor, int textColor);
 
+/** Draws a char to the VRAM using the charmap.
+	@param x X coordinate
+	@param y Y coordinate
+	@param ch Char to draw
+	@param bgColor Background color of the character
+	@param textColor Color of the character
+*/
+void putCharVRAM(int x, int y, char ch, int bgColor, int textColor);
+
 /** Draws a string to the screen using the charmap.
 	@param x X coordinate
 	@param y Y coordinate
@@ -100,6 +116,15 @@ void putChar(int x, int y, char ch, int bgColor, int textColor);
 	@param textColor Color of the character
 */
 void putStr(int x, int y, char* str, int bgColor, int textColor);
+
+/** Draws a string to the VRAM using the charmap.
+	@param x X coordinate
+	@param y Y coordinate
+	@param str String to draw
+	@param bgColor Background color of the character
+	@param textColor Color of the character
+*/
+void putStrVRAM(int x, int y, char* str, int bgColor, int textColor);
 
 /** Draws a string to the screen
 	@param offset_x x offset (pixel)
@@ -160,6 +185,13 @@ void nio_Clear(nio_console* c);
 	@param pos_y Row
 */
 void nio_DrawChar(nio_console* c, int pos_x, int pos_y);
+
+/** Draws a char from a console to the VRAM at the given position; It is not saved.
+	@param c Console
+	@param pos_x Column
+	@param pos_y Row
+*/
+void nio_DrawCharVRAM(nio_console* c, int pos_x, int pos_y);
 
 /** Saves a char in a console at the given position; It is not drawn.
 	@param c Console

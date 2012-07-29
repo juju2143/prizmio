@@ -18,9 +18,6 @@ Prizm I/O 0.1 is compatible with Nspire I/O 2.0 so you can make
 programs that works on both the Nspire and the Prizm (with some
 #ifdef abuse).
 
-To speed up the drawing, you should call the Bdisp_PutDisp_DD()
-syscall yourself to draw the VRAM onscreen.
-
 Documentation
 -------------
 An auto-generated documentation can be found in the "doc/html"
