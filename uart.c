@@ -27,13 +27,12 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#include <fxcg/serial.h>
 #include "prizmio.h"
 
 BOOL uart_ready(void)
 {
-/*	volatile unsigned *line_status_reg = is_classic ? (unsigned*)0x90020014 : (unsigned*)0x90020018;
-	return *line_status_reg & 0b1;
-*/	return FALSE;
+	return (Serial_IsOpen()==1) ? TRUE : FALSE;
 }
 
 char uart_getc(void)

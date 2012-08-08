@@ -34,16 +34,9 @@
 // They're here until they get defined in the SDK.
 // You can safely remove the definitions if they get defined elsewhere.
 
-// stdint.h
-typedef long unsigned int size_t;
-
-// strbool.h
 typedef enum { false, true } bool;
 // Also define the uppercased variant
 typedef enum { FALSE, TRUE } BOOL;
-
-// string.h
-extern size_t strlen(const char *s);
 
 // ---
 

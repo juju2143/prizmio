@@ -26,11 +26,12 @@
  * Store/Get binary data from files
  */
 #include <stdlib.h>
+#include <stdio.h>
 #include "prizmio.h"
 	
 int reg_store(void* dataptr, size_t size, char* regpath)
 {
-/*	FILE* file;
+	FILE* file;
 	
 	file = fopen(regpath,"wb");
 	if(file == NULL)
@@ -39,7 +40,6 @@ int reg_store(void* dataptr, size_t size, char* regpath)
 	fclose(file);
 	
 	return 0;
-*/	return -1;
 }
 
 void* reg_get(char* regpath)
@@ -48,7 +48,7 @@ void* reg_get(char* regpath)
 	void* result;
 	FILE* file;
 	
-	if(stat(regpath,&fstat) == -1)
+	//if(stat(regpath,&fstat) == -1)
 		return NULL;
 	result = malloc(fstat.st_size);
 	if(result == NULL)
@@ -60,5 +60,5 @@ void* reg_get(char* regpath)
 	fclose(file);
 	
 	return result;
-*/	return 0;
+*/	return NULL;
 }

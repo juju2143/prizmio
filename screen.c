@@ -26,13 +26,11 @@
  * Screen functions
  */
 #include <stdlib.h>
-#include <display.h>
-#include <display_syscalls.h>
-#include <color.h>
+#include <string.h>
+#include <fxcg/display.h>
 #include "charmap.h"
 #include "prizmio.h"
 
-unsigned short *scr = (unsigned short *) 0xA8000000;
 unsigned short palette[16] = { 
 	COLOR_BLACK,
 	COLOR_DARKRED,
@@ -52,9 +50,9 @@ unsigned short palette[16] = {
 	COLOR_WHITE
 };
 
-
 void setPixel(int x, int y, unsigned int color)
 {
+	unsigned short *scr = GetVRAMAddress();
 	if(x >= 0 && x < LCD_WIDTH_PX && y >= 0 && y < LCD_HEIGHT_PX)
 	{
 		scr[y*LCD_WIDTH_PX+x] = palette[color];
@@ -64,6 +62,7 @@ void setPixel(int x, int y, unsigned int color)
 
 void setPixelVRAM(int x, int y, unsigned int color)
 {
+	unsigned short *scr = GetVRAMAddress();
 	if(x >= 0 && x < LCD_WIDTH_PX && y >= 0 && y < LCD_HEIGHT_PX)
 	{
 		scr[y*LCD_WIDTH_PX+x] = palette[color];
