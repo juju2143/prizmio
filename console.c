@@ -26,8 +26,9 @@
  * Console functions
  */
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
-#include <keyboard.hpp>
+#include <fxcg/keyboard.h>
 #include "prizmio.h"
 
 const unsigned short* keyboard_register = (unsigned short*)0xA44B0000;
@@ -82,7 +83,7 @@ void nio_drawchVRAM(int offset_x, int offset_y, int x, int y, char ch, char bgCo
 
 void nio_load(char* path, nio_console* c)
 {
-/*	FILE* f = fopen(path,"rb");
+	FILE* f = fopen(path,"rb");
 	
 	fread(&c->cursor_x,sizeof(int),1,f);
 	fread(&c->cursor_y,sizeof(int),1,f);
@@ -104,12 +105,12 @@ void nio_load(char* path, nio_console* c)
 	fread(c->data,sizeof(char),c->max_x*c->max_y,f);
 	fread(c->color,sizeof(char),c->max_x*c->max_y,f);
 	
-	fclose(f);*/
+	fclose(f);
 }
 
 void nio_save(char* path, nio_console* c)
 {
-/*	FILE* f = fopen(path,"wb");
+	FILE* f = fopen(path,"wb");
 	
 	fwrite(&c->cursor_x,sizeof(int),1,f);
 	fwrite(&c->cursor_y,sizeof(int),1,f);
@@ -128,7 +129,7 @@ void nio_save(char* path, nio_console* c)
 	fwrite(c->data,sizeof(char),c->max_x*c->max_y,f);
 	fwrite(c->color,sizeof(char),c->max_x*c->max_y,f);
 	
-	fclose(f);*/
+	fclose(f);
 }
 
 BOOL shift = FALSE;
