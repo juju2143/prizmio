@@ -41,22 +41,24 @@ typedef enum { FALSE, TRUE } BOOL;
 // ---
 
 /** Color defines */
-#define NIO_BLACK 0
-#define NIO_RED 1
-#define NIO_GREEN 2
-#define NIO_YELLOW 3
-#define NIO_BLUE 4
-#define NIO_MAGENTA 5
-#define NIO_CYAN 6
-#define NIO_GRAY 7
-#define NIO_LIGHTBLACK 8
-#define NIO_LIGHTRED 9
-#define NIO_LIGHTGREEN 10
-#define NIO_LIGHTYELLOW 11
-#define NIO_LIGHTBLUE 12
-#define NIO_LIGHTMAGENTA 13
-#define NIO_LIGHTCYAN 14
-#define NIO_WHITE 15
+typedef enum {
+	NIO_BLACK = 0,
+	NIO_RED,
+	NIO_GREEN,
+	NIO_YELLOW,
+	NIO_BLUE,
+	NIO_MAGENTA,
+	NIO_CYAN,
+	NIO_GRAY,
+	NIO_LIGHTBLACK,
+	NIO_LIGHTRED,
+	NIO_LIGHTGREEN,
+	NIO_LIGHTYELLOW,
+	NIO_LIGHTBLUE,
+	NIO_LIGHTMAGENTA,
+	NIO_LIGHTCYAN,
+	NIO_WHITE
+} nio_color;
 
 /** Console structure. */
 struct nio_console

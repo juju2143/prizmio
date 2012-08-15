@@ -37,12 +37,14 @@ int main()
 	
 	// Initialize console 1.
 	nio_console c1;
+
+	// The screen can hold up to 64 columns and 27 rows
 	// 64 columns, 14 rows. 0px offset for x/y. Background color 15 (white), foreground color 0 (black)
-	nio_InitConsole(&c1,64,14,0,0,0,15);
+	nio_InitConsole(&c1,64,14,0,0, NIO_BLACK, NIO_WHITE);
 	nio_DrawConsole(&c1);
 	
 	nio_console c2;
-	nio_InitConsole(&c2,64,13,0,14*8,0,15);
+	nio_InitConsole(&c2,64,13,0,14*8, NIO_BLACK, NIO_WHITE);
 	nio_DrawConsole(&c2);
 	
 	// Just showing printf
@@ -56,9 +58,6 @@ int main()
 	}
 	nio_printf(&c2,"\n");
 
-	// You should call this syscall yourself so it goes faster... or not.
-	//Bdisp_PutDisp_DD();
-	
 	// Press EXE to exit
 	while(1)
 	{
