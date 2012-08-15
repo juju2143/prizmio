@@ -4,8 +4,8 @@
 
 Installation
 ------------
-Compiles with PrizmSDK 0.3, available on Cemetech and the latest 
-libfxcg, available on https://github.com/Jonimoose/libfxcg
+Compiles with the latest libfxcg, available on
+https://github.com/Jonimoose/libfxcg
 To install it, just specify the FXCGSDK environment variable then run 
 "make". If not specified, the installation directory will be "../../".
 

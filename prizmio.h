@@ -141,6 +141,11 @@ void nio_drawstr(int offset_x, int offset_y, int x, int y, char *str, char bgCol
 */
 void nio_drawch(int offset_x, int offset_y, int x, int y, char ch, char bgColor, char textColor);
 
+void keyupdate(void);
+int keydownlast(int basic_keycode);
+int keydownhold(int basic_keycode);
+int isKeyPressed(int basic_keycode);
+
 /** Reads a char from the keyboard
 	@return ASCII char
 */

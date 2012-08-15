@@ -27,8 +27,7 @@
  */
 #include <stdlib.h>
 #include <string.h>
-#include <display.h>
-#include <display_syscalls.h>
+#include <fxcg/display.h>
 #include <prizmio.h>
 
 int main()

@@ -31,6 +31,8 @@
 #include "charmap.h"
 #include "prizmio.h"
 
+#define VRAM (unsigned short*)0xA8000000;
+
 unsigned short palette[16] = { 
 	COLOR_BLACK,
 	COLOR_DARKRED,
@@ -52,7 +54,7 @@ unsigned short palette[16] = {
 
 void setPixel(int x, int y, unsigned int color)
 {
-	unsigned short *scr = GetVRAMAddress();
+	unsigned short *scr = VRAM;
 	if(x >= 0 && x < LCD_WIDTH_PX && y >= 0 && y < LCD_HEIGHT_PX)
 	{
 		scr[y*LCD_WIDTH_PX+x] = palette[color];
@@ -62,7 +64,7 @@ void setPixel(int x, int y, unsigned int color)
 
 void setPixelVRAM(int x, int y, unsigned int color)
 {
-	unsigned short *scr = GetVRAMAddress();
+	unsigned short *scr = VRAM;
 	if(x >= 0 && x < LCD_WIDTH_PX && y >= 0 && y < LCD_HEIGHT_PX)
 	{
 		scr[y*LCD_WIDTH_PX+x] = palette[color];
