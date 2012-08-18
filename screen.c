@@ -33,6 +33,7 @@
 
 #define VRAM (unsigned short*)0xA8000000;
 
+/* old palette
 unsigned short palette[16] = { 
 	COLOR_BLACK,
 	COLOR_DARKRED,
@@ -50,15 +51,40 @@ unsigned short palette[16] = {
 	COLOR_MAGENTA,
 	COLOR_CYAN,
 	COLOR_WHITE
-};
+};*/
+
+unsigned short getPaletteColor(unsigned int color)
+{
+	unsigned short palette[16] = {0x0000, 0xa800, 0x0540, 0xaaa0, 0x0015, 0xa815, 0x0555, 0xad55,
+					0x5aab, 0xfaab, 0x5feb, 0xffeb, 0x5abf, 0xfabf, 0x5fff, 0xffff};
+	int rbtable[6] = {0,6,12,18,24,31};
+	int gtable[6] = {0,12,25,37,50,63};
+        unsigned int c = color;
+        unsigned int d;
+        if(c < 16)
+        {
+                return palette[c];
+        }
+        else if(c < 232)
+        {
+                d = c-16;
+                return (rbtable[d/36]<<11)+(gtable[(d/6)%6]<<5)+rbtable[d%6];
+        }
+        else if(c < 256)
+        {
+                d = c-232;
+                return ((d+1)<<11)+((d*2+2)<<5)+(d+1);
+        }
+	return 0;
+}
 
 void setPixel(int x, int y, unsigned int color)
 {
 	unsigned short *scr = VRAM;
 	if(x >= 0 && x < LCD_WIDTH_PX && y >= 0 && y < LCD_HEIGHT_PX)
 	{
-		scr[y*LCD_WIDTH_PX+x] = palette[color];
-		Bdisp_SetPoint_DD(x, y, palette[color]);
+		scr[y*LCD_WIDTH_PX+x] = getPaletteColor(color);
+		Bdisp_SetPoint_DD(x, y, getPaletteColor(color));
 	}
 }
 
@@ -67,7 +93,7 @@ void setPixelVRAM(int x, int y, unsigned int color)
 	unsigned short *scr = VRAM;
 	if(x >= 0 && x < LCD_WIDTH_PX && y >= 0 && y < LCD_HEIGHT_PX)
 	{
-		scr[y*LCD_WIDTH_PX+x] = palette[color];
+		scr[y*LCD_WIDTH_PX+x] = getPaletteColor(color);
 	}
 }
 

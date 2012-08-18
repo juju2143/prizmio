@@ -64,7 +64,7 @@ typedef enum {
 struct nio_console
 {
 	char* data; /**< Data pointer */
-	char* color; /**< Color pointer */
+	unsigned short* color; /**< Color pointer */
 	int cursor_x; /**< Current X position */
 	int cursor_y; /**< Current Y position */
 	int max_x; /**< Column count */
@@ -88,6 +88,8 @@ void nio_load(char* path, nio_console* c);
 	@param c Console
 */
 void nio_save(char* path, nio_console* c);
+
+unsigned short getPaletteColor(unsigned int color);
 
 /** Draws a pixel to the screen.
 	@param x X coordinate
@@ -148,7 +150,7 @@ void putStrVRAM(int x, int y, char* str, int bgColor, int textColor);
 	@param bgColor Background color
 	@param textColor Text color
 */
-void nio_drawstr(int offset_x, int offset_y, int x, int y, char *str, char bgColor, char textColor);
+void nio_drawstr(int offset_x, int offset_y, int x, int y, char *str, unsigned char bgColor, unsigned char textColor);
 
 /** Draws a char to the screen
 	@param offset_x x offset (pixel)
@@ -159,7 +161,7 @@ void nio_drawstr(int offset_x, int offset_y, int x, int y, char *str, char bgCol
 	@param bgColor Background color
 	@param textColor Text color
 */
-void nio_drawch(int offset_x, int offset_y, int x, int y, char ch, char bgColor, char textColor);
+void nio_drawch(int offset_x, int offset_y, int x, int y, char ch, unsigned char bgColor, unsigned char textColor);
 
 void keyupdate(void);
 int keydownlast(int basic_keycode);
@@ -180,7 +182,7 @@ char nio_getch(void);
 	@param background_color Default background color
 	@param foreground_color Default foreground color
 */
-void nio_InitConsole(nio_console* c, int size_x, int size_y, int offset_x, int offset_y, char background_color, char foreground_color);
+void nio_InitConsole(nio_console* c, int size_x, int size_y, int offset_x, int offset_y, unsigned char background_color, unsigned char foreground_color);
 
 /** Draws a console to the screen.
 	@param c Console
@@ -261,7 +263,7 @@ int nio_GetStr(nio_console* c, char* str);
 	@param background_color Background color
 	@param foreground_color Foreground color
 */
-void nio_SetColor(nio_console* c, char background_color, char foreground_color);
+void nio_SetColor(nio_console* c, unsigned char background_color, unsigned char foreground_color);
 
 /** Frees the allocated memory.
 	@param c Console

@@ -49,7 +49,7 @@ int main()
 	
 	// Just showing printf
 	nio_printf(&c1,"%s build at %s, %s\n",__FILE__,__DATE__,__TIME__);
-	nio_printf(&c2,"16 text colors available! ");
+	nio_printf(&c2,"256 text colors available! ");
 	int i;
 	for(i = 1; i<16; i++)
 	{
