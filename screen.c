@@ -2,7 +2,7 @@
  * @file screen.c
  * @author Julien "Juju" Savard <juju2143@gmail.com>
  * @author Julian Mackeben aka compu <compujucke@googlemail.com>
- * @version 0.1
+ * @version 3.0
  *
  * @section LICENSE
  *
@@ -33,26 +33,6 @@
 
 #define VRAM (unsigned short*)0xA8000000;
 
-/* old palette
-unsigned short palette[16] = { 
-	COLOR_BLACK,
-	COLOR_DARKRED,
-	COLOR_GREEN,
-	COLOR_OLIVE,
-	COLOR_DARKBLUE,
-	COLOR_DARKMAGENTA,
-	COLOR_DARKCYAN,
-	COLOR_GRAY,
-	COLOR_DARKGRAY,
-	COLOR_RED,
-	COLOR_LIME,
-	COLOR_YELLOW,
-	COLOR_BLUE,
-	COLOR_MAGENTA,
-	COLOR_CYAN,
-	COLOR_WHITE
-};*/
-
 unsigned short getPaletteColor(unsigned int color)
 {
 	unsigned short palette[16] = {0x0000, 0xa800, 0x0540, 0xaaa0, 0x0015, 0xa815, 0x0555, 0xad55,
@@ -78,7 +58,7 @@ unsigned short getPaletteColor(unsigned int color)
 	return 0;
 }
 
-void setPixel(int x, int y, unsigned int color)
+void nio_pixel_set(int x, int y, unsigned int color)
 {
 	unsigned short *scr = VRAM;
 	if(x >= 0 && x < LCD_WIDTH_PX && y >= 0 && y < LCD_HEIGHT_PX)
@@ -88,7 +68,7 @@ void setPixel(int x, int y, unsigned int color)
 	}
 }
 
-void setPixelVRAM(int x, int y, unsigned int color)
+void nio_vram_pixel_set(int x, int y, unsigned int color)
 {
 	unsigned short *scr = VRAM;
 	if(x >= 0 && x < LCD_WIDTH_PX && y >= 0 && y < LCD_HEIGHT_PX)
@@ -97,59 +77,59 @@ void setPixelVRAM(int x, int y, unsigned int color)
 	}
 }
 
-void putChar(int x, int y, char ch, int bgColor, int textColor)
+void nio_pixel_putc(int x, int y, char ch, int bgColor, int textColor)
 {
 	int i, j, pixelOn;
-	for(i = 0; i < CHAR_WIDTH; i++)
+	for(i = 0; i < NIO_CHAR_WIDTH; i++)
 	{
-		for(j = CHAR_HEIGHT; j > 0; j--)
+		for(j = NIO_CHAR_HEIGHT; j > 0; j--)
 		{
 			pixelOn = MBCharSet8x6_definition[(unsigned char)ch][i] << j ;
 			pixelOn = pixelOn & 0x80 ;
-			if (pixelOn) 		setPixel(x+i,y+CHAR_HEIGHT-j,textColor);
-			else if(!pixelOn) 	setPixel(x+i,y+CHAR_HEIGHT-j,bgColor);
+			if (pixelOn) 		nio_pixel_set(x+i,y+NIO_CHAR_HEIGHT-j,textColor);
+			else if(!pixelOn) 	nio_pixel_set(x+i,y+NIO_CHAR_HEIGHT-j,bgColor);
 		}
 	}
 }
-void putStr(int x, int y, char* str, int bgColor, int textColor)
+void nio_pixel_puts(int x, int y, char* str, int bgColor, int textColor)
 {
 	int l = strlen(str);
 	int i;
 	int stop=0;
 	for (i = 0; i < l && !stop; i++)
 	{
-		putChar(x, y, str[i], bgColor, textColor);
-		x += CHAR_WIDTH;
-		if (x >= LCD_WIDTH_PX-CHAR_WIDTH)
+		nio_pixel_putc(x, y, str[i], bgColor, textColor);
+		x += NIO_CHAR_WIDTH;
+		if (x >= LCD_WIDTH_PX-NIO_CHAR_WIDTH)
 		{
 			stop=1;
 		}
 	}
 }
-void putCharVRAM(int x, int y, char ch, int bgColor, int textColor)
+void nio_vram_pixel_putc(int x, int y, char ch, int bgColor, int textColor)
 {
 	int i, j, pixelOn;
-	for(i = 0; i < CHAR_WIDTH; i++)
+	for(i = 0; i < NIO_CHAR_WIDTH; i++)
 	{
-		for(j = CHAR_HEIGHT; j > 0; j--)
+		for(j = NIO_CHAR_HEIGHT; j > 0; j--)
 		{
 			pixelOn = MBCharSet8x6_definition[(unsigned char)ch][i] << j ;
 			pixelOn = pixelOn & 0x80 ;
-			if (pixelOn) 		setPixelVRAM(x+i,y+CHAR_HEIGHT-j,textColor);
-			else if(!pixelOn) 	setPixelVRAM(x+i,y+CHAR_HEIGHT-j,bgColor);
+			if (pixelOn) 		nio_vram_pixel_set(x+i,y+NIO_CHAR_HEIGHT-j,textColor);
+			else if(!pixelOn) 	nio_vram_pixel_set(x+i,y+NIO_CHAR_HEIGHT-j,bgColor);
 		}
 	}
 }
-void putStrVRAM(int x, int y, char* str, int bgColor, int textColor)
+void nio_vram_pixel_puts(int x, int y, char* str, int bgColor, int textColor)
 {
 	int l = strlen(str);
 	int i;
 	int stop=0;
 	for (i = 0; i < l && !stop; i++)
 	{
-		putCharVRAM(x, y, str[i], bgColor, textColor);
-		x += CHAR_WIDTH;
-		if (x >= LCD_WIDTH_PX-CHAR_WIDTH)
+		nio_vram_pixel_putc(x, y, str[i], bgColor, textColor);
+		x += NIO_CHAR_WIDTH;
+		if (x >= LCD_WIDTH_PX-NIO_CHAR_WIDTH)
 		{
 			stop=1;
 		}

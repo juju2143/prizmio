@@ -2,7 +2,7 @@
  * @file prizmio.h
  * @author  Julien "Juju" Savard <juju2143@gmail.com>
  * @author  Julian Mackeben aka compu <compujuckel@googlemail.com>
- * @version 0.1
+ * @version 3.0
  *
  * @section LICENSE
  *
@@ -23,7 +23,7 @@
  *
  * @section DESCRIPTION
  *
- * Prizm I/O 1.0 header file, based on Nspire I/O 2.0
+ * Prizm I/O 3.0 header file, based on Nspire I/O 3.0
  */
 #include <stdlib.h>
 
@@ -58,217 +58,221 @@ typedef enum {
 	NIO_COLOR_LIGHTMAGENTA,
 	NIO_COLOR_LIGHTCYAN,
 	NIO_COLOR_WHITE
-} nio_color;
+} nio_colour;
 
 /** Console structure. */
 struct nio_console
 {
-	char* data; /**< Data pointer */
-	unsigned short* color; /**< Color pointer */
-	int cursor_x; /**< Current X position */
-	int cursor_y; /**< Current Y position */
-	int max_x; /**< Column count */
-	int max_y; /**< Row count */
-	int offset_x; /**< X pixel offset */
-	int offset_y; /**< Y pixel offset */
-	char default_background_color; /**< Color that will be used as default background */
-	char default_foreground_color; /**< Color that will be used as default foreground */
-	BOOL drawing_enabled; /**< Automatically draw any new text to the screen */
+	char* data;
+	unsigned short* color;
+	int cursor_x;
+	int cursor_y;
+	int max_x;
+	int max_y;
+	int offset_x;
+	int offset_y;
+	unsigned char default_background_color;
+	unsigned char default_foreground_color;
+	BOOL drawing_enabled;
+	BOOL cursor_enabled;
+	int cursor_type;
+	int cursor_line_width;
+	unsigned char cursor_custom_data[6];
+	BOOL cursor_blink_enabled;
+	BOOL cursor_blink_status;
+	unsigned cursor_blink_timestamp;
+	unsigned cursor_blink_duration;
 };
 typedef struct nio_console nio_console;
 
-/** Loads a console to flash storage.
-	@param path File path
-	@param c Console
-*/
-void nio_load(char* path, nio_console* c);
+#define NIO_CURSOR_BLOCK 0
+#define NIO_CURSOR_UNDERSCORE 1
+#define NIO_CURSOR_VERTICAL 2
+#define NIO_CURSOR_CUSTOM 3
 
-/** Saves a console to flash storage.
-	@param path File path
-	@param c Console
-*/
-void nio_save(char* path, nio_console* c);
+#define NIO_CHAR_WIDTH 6
+#define NIO_CHAR_HEIGHT 8
 
-unsigned short getPaletteColor(unsigned int color);
-
-/** Draws a pixel to the screen.
-	@param x X coordinate
-	@param y Y coordinate
-	@param color Pixel color
-*/
-void setPixel(int x, int y, unsigned int color);
-
-/** Draws a pixel to the VRAM.
-	@param x X coordinate
-	@param y Y coordinate
-	@param color Pixel color
-*/
-void setPixelVRAM(int x, int y, unsigned int color);
-
-/** Draws a char to the screen using the charmap.
-	@param x X coordinate
-	@param y Y coordinate
-	@param ch Char to draw
-	@param bgColor Background color of the character
-	@param textColor Color of the character
-*/
-void putChar(int x, int y, char ch, int bgColor, int textColor);
-
-/** Draws a char to the VRAM using the charmap.
-	@param x X coordinate
-	@param y Y coordinate
-	@param ch Char to draw
-	@param bgColor Background color of the character
-	@param textColor Color of the character
-*/
-void putCharVRAM(int x, int y, char ch, int bgColor, int textColor);
-
-/** Draws a string to the screen using the charmap.
-	@param x X coordinate
-	@param y Y coordinate
-	@param str String to draw
-	@param bgColor Background color of the character
-	@param textColor Color of the character
-*/
-void putStr(int x, int y, char* str, int bgColor, int textColor);
-
-/** Draws a string to the VRAM using the charmap.
-	@param x X coordinate
-	@param y Y coordinate
-	@param str String to draw
-	@param bgColor Background color of the character
-	@param textColor Color of the character
-*/
-void putStrVRAM(int x, int y, char* str, int bgColor, int textColor);
-
-/** Draws a string to the screen
-	@param offset_x x offset (pixel)
-	@param offset_y y offset (pixel)
-	@param x Column
-	@param y Row
-	@param str String
-	@param bgColor Background color
-	@param textColor Text color
-*/
-void nio_drawstr(int offset_x, int offset_y, int x, int y, char *str, unsigned char bgColor, unsigned char textColor);
-
-/** Draws a char to the screen
-	@param offset_x x offset (pixel)
-	@param offset_y y offset (pixel)
-	@param x Column
-	@param y Row
-	@param ch String
-	@param bgColor Background color
-	@param textColor Text color
-*/
-void nio_drawch(int offset_x, int offset_y, int x, int y, char ch, unsigned char bgColor, unsigned char textColor);
+#define NIO_MAX_ROWS 27
+#define NIO_MAX_COLS 64
 
 void keyupdate(void);
 int keydownlast(int basic_keycode);
 int keydownhold(int basic_keycode);
 int isKeyPressed(int basic_keycode);
 
-/** Reads a char from the keyboard
-	@return ASCII char
+/** Draws a string to the screen on the given position. For internal use.
+	@param offset_x x offset in px
+	@param offset_y y offset in px
+	@param x x position in columns (px*6)
+	@param y y position in rows (px*8)
+	@param str String
+	@param bgColor Background color
+	@param textColor text color
 */
-char nio_getch(void);
+void nio_grid_puts(const int offset_x, const int offset_y, const int x, const int y, const char *str, const unsigned char bgColor, const unsigned char textColor);
 
-/** Initializes a console.
-	@param c Console
-	@param size_x Number of columns
-	@param size_y Number of rows
-	@param offset_x x offset (pixel)
-	@param offset_y y offset (pixel)
-	@param background_color Default background color
-	@param foreground_color Default foreground color
+/** Draws a char to the screen on the given position. For internal use.
+	@param offset_x x offset in px
+	@param offset_y y offset in px
+	@param x x position in columns (px*6)
+	@param y y position in rows (px*8)
+	@param c Char
+	@param bgColor Background color
+	@param textColor text color
 */
-void nio_InitConsole(nio_console* c, int size_x, int size_y, int offset_x, int offset_y, unsigned char background_color, unsigned char foreground_color);
+void nio_grid_putc(const int offset_x, const int offset_y, const int x, const int y, const char ch, const unsigned char bgColor, const unsigned char textColor);
 
-/** Draws a console to the screen.
+/** Loads a console from a file on flash storage.
+    @param path File path
 	@param c Console
 */
-void nio_DrawConsole(nio_console* c);
+void nio_load(const char* path, nio_console* c);
 
-/** Scrolls the console one line down.
+/** Saves a console to a file in flash storage.
+	@param path File path
 	@param c Console
 */
-void nio_ScrollDown(nio_console* c);
+void nio_save(const char* path, const nio_console* c);
+
+/** Sets a default console that will be used for all functions without console argument, e.g. nio_puts()
+	@param c Console
+*/
+void nio_set_default(nio_console* c);
 
 /** Clears a console.
 	@param c Console
 */
-void nio_Clear(nio_console* c);
+void nio_clear(nio_console* c);
 
-/** Draws a char from a console to the screen at the given position; It is not saved.
+/** Scrolls a console one line down.
 	@param c Console
-	@param pos_x Column
-	@param pos_y Row
 */
-void nio_DrawChar(nio_console* c, int pos_x, int pos_y);
+void nio_scroll(nio_console* c);
 
-/** Draws a char from a console to the VRAM at the given position; It is not saved.
-	@param c Console
-	@param pos_x Column
-	@param pos_y Row
-*/
-void nio_DrawCharVRAM(nio_console* c, int pos_x, int pos_y);
+/** Draws a char from the console to the screen. For internal use.
+    @param c Console
+    @param pos_x x position
+    @param pos_y y position
+ */
+void nio_csl_drawchar(nio_console* c, const int pos_x, const int pos_y);
 
-/** Saves a char in a console at the given position; It is not drawn.
-	@param c Console
-	@param ch char to be stored
-	@param pos_x Column
-	@param pos_y Row
-*/
-void nio_SetChar(nio_console* c, char ch, int pos_x, int pos_y);
+/** Draws a char from the console to the VRAM. For internal use.
+    @param c Console
+    @param pos_x x position
+    @param pos_y y position
+ */
+void nio_vram_csl_drawchar(nio_console* c, const int pos_x, const int pos_y);
 
-/** Prints a char in a console.
+/** Saves a char in a console without drawing it. For internal use.
 	@param c Console
 	@param ch Char
+	@param pos_x x position
+	@param pos_y y position
 */
-void nio_PrintChar(nio_console* c, char ch);
+void nio_csl_savechar(nio_console* c, const char ch, const int pos_x, const int pos_y);
 
-/** Enables immediate drawing when a character is written to the console.
-	@param c Console
-	@param drawing_enabled When this is true, a char will be immediately drawn to the screen, false: The console will not refresh if you write data to it
+/** Immediately gets a char from the keyboard. For internal use.
+    @param c Console
+	@return Char
 */
-void nio_EnableDrawing(nio_console* c, BOOL drawing_enabled);
+char nio_getch(nio_console* c);
 
-/** Prints a string in a console.
-	@param c Console
-	@param str String
-*/
-void nio_PrintStr(nio_console* c, char* str);
-
-/** Prints a formatted string to a console.
-	@param c Console
-	@param format Format string
-	@param ... Additional arguments
-*/
-void nio_printf(nio_console* c, char *format, ...);
-
-/** Reads a char and prints it to the console.
-	@param c Console
-	@return ASCII char
-*/
-char nio_GetChar(nio_console* c);
-
-/** Reads a string and prints it to the console.
-	@param c Console
-	@param str String destination
-*/
-int nio_GetStr(nio_console* c, char* str);
-
-/** Sets the Foreground/Background color.
+/** Sets the background- and text color of a console. Possible values are 0-15.
 	@param c Console
 	@param background_color Background color
-	@param foreground_color Foreground color
+	@param foreground_color Text color
 */
-void nio_SetColor(nio_console* c, unsigned char background_color, unsigned char foreground_color);
+void nio_color(nio_console* c, const unsigned char background_color, const unsigned char foreground_color);
 
-/** Frees the allocated memory.
+/** Changes the drawing behavior of a console.
+	@param c Console
+	@param enable_drawing If this is true, a console will automatically be updated if text is written to it.
+*/
+void nio_drawing_enabled(nio_console* c, const BOOL enable_drawing);
+
+/** Initializes a console.
+	@param c Console
+	@param size_x console width
+	@param size_y console height
+	@param offset_x x position
+	@param offset_y y position
+	@param background_color Background color
+	@param foreground_color Text color
+    @param drawing_enabled See nio_enable_drawing()
+*/
+void nio_init(nio_console* c, const int size_x, const int size_y, const int offset_x, const int offset_y, const unsigned char background_color, const unsigned char foreground_color, const BOOL drawing_enabled);
+
+/** Uninitializes a console. This should always be called before the program ends.
 	@param c Console
 */
-void nio_CleanUp(nio_console* c);
+void nio_free(nio_console* c);
+
+/** For use with NIO_REPLACE_STDIO. Use at the beginning of your program.
+*/
+void nio_use_stdio(void);
+
+/** For use with NIO_REPLACE_STDIO. Use at the end of your program.
+*/
+void nio_free_stdio(void);
+
+/** See [fflush](http://www.cplusplus.com/reference/clibrary/cstdio/fflush/)
+	\note This is useful for consoles with enable_drawing set to false. Using this function will result in the console being drawn.
+*/
+int nio_fflush(nio_console* c);
+
+/** See [fputc](http://www.cplusplus.com/reference/clibrary/cstdio/fputc/)
+*/
+char nio_fputc(char ch, nio_console* c);
+
+/** See [putchar](http://www.cplusplus.com/reference/clibrary/cstdio/putchar/)
+*/
+char nio_putchar(const char ch);
+
+/** See [fputs](http://www.cplusplus.com/reference/clibrary/cstdio/fputs/)
+*/
+int nio_fputs(const char* str, nio_console* c);
+
+/** See [puts](http://www.cplusplus.com/reference/clibrary/cstdio/puts/)
+*/
+int nio_puts(const char* str);
+
+/** See [fgetc](http://www.cplusplus.com/reference/clibrary/cstdio/fgetc)
+*/
+char nio_fgetc(nio_console* c);
+
+/** See [getchar](http://www.cplusplus.com/reference/clibrary/cstdio/getchar)
+*/
+char nio_getchar(void);
+
+/** See [fgets](http://www.cplusplus.com/reference/clibrary/cstdio/fgets/)
+    \todo Do not ignore num
+*/
+char* nio_fgets(char* str, int num, nio_console* c);
+
+/** See [gets](http://www.cplusplus.com/reference/clibrary/cstdio/gets/)
+*/
+char* nio_gets(char* str);
+
+//int nio_vfprintf(nio_console* c, const char* format, va_list* arglist);
+
+/** See [fprintf](http://www.cplusplus.com/reference/clibrary/cstdio/fprintf/)
+*/
+int nio_fprintf(nio_console* c, const char* format, ...);
+
+/** See [printf](http://www.cplusplus.com/reference/clibrary/cstdio/printf/)
+*/
+int nio_printf(const char* format, ...);
+
+/** See [perror](http://www.cplusplus.com/reference/clibrary/cstdio/perror/)
+*/
+void nio_perror(const char* str);
+
+// Macro of nio_fgetc
+#define nio_getc nio_fgetc
+
+// Macro of nio_fputc
+#define nio_putc nio_fputc
 
 /** Stores binary data in a file.
 	@param dataptr Pointer to the data to be stored
@@ -289,31 +293,178 @@ void* reg_get(char* regpath);
 */
 BOOL uart_ready(void);
 
-/** Gets a char from RS232.
+/** See [getchar](http://www.cplusplus.com/reference/clibrary/cstdio/getchar/)
 	@return Char
 */
-char uart_getc(void);
+char uart_getchar(void);
 
-/** Gets a line (ended with \n) from RS232.
-	@param dest String destination
+/** See [gets](http://www.cplusplus.com/reference/clibrary/cstdio/gets/)
+	@return Destination
 */
-void uart_getline(char* dest);
+char* uart_gets(char* str);
 
-/** Puts a char to RS232.
-	@param c Char
+/** See [putchar](http://www.cplusplus.com/reference/clibrary/cstdio/putchar/)
 */
-void uart_putc(char c);
+char uart_putchar(char character);
 
-/** Puts a string to RS232.
-	@param str String
+/** See [puts](http://www.cplusplus.com/reference/clibrary/cstdio/puts/)
+    \note This DOES NOT append a newline (\\n) character.
 */
-void uart_puts(const char *str);
+int uart_puts(const char *str);
 
-/** Puts a formatted string to RS232.
-	@param format Format string
-	@param ... Additional arguments
+/** See [printf](http://www.cplusplus.com/reference/clibrary/cstdio/printf/)
 */
 void uart_printf(char *format, ...);
 
+/** Returns the current time.
+	@return Current RTC time
+*/
+inline unsigned nio_time_get();
+
+/** Draws the cursor of the console, if enabled.
+	@param c Console
+*/
+void nio_cursor_draw(nio_console* c);
+
+/** Erases the cursor of the console, if enabled.
+	@param c Console
+*/
+void nio_cursor_erase(nio_console* c);
+
+/** Draws a blinking cursor, if enabled. Blinking occurs on an interval set inside the console.
+	@param c Console
+*/
+void nio_cursor_blinking_draw(nio_console* c);
+
+/** Resets the blinking cursor timer.
+	@param c Console
+*/
+void nio_cursor_blinking_reset(nio_console* c);
+
+/** Enables the console cursor.
+	@param c Console
+	@param enable_cursor When this is true, a cursor will be drawn to the screen, false: no cursor shown.
+*/
+void nio_cursor_enable(nio_console* c, BOOL enable_cursor);
+
+/** Enables console cursor blinking.
+	@param c Console
+	@param enable_cursor_blink When this is true, the cursor will blink, false: no cursor blinking will occur.
+*/
+void nio_cursor_blinking_enable(nio_console* c, BOOL enable_cursor_blink);
+
+/** Sets the console cursor blink duration (the time it takes to switch on or off)
+	@param c Console
+	@param duration The time (in seconds) it takes to switch on or off.
+*/
+void nio_cursor_blinking_duration(nio_console* c, int duration);
+
+/** Sets the console cursor type.
+	@param c Console
+	@param cursor_type The cursor type. 0 is a block cursor (default, like a
+	Linux X11 terminal), 1 is an underscore cursor (like a Windows Command
+	Prompt window), 2 is a vertical bar cursor (like a regular text box),
+	and 3 is a custom cursor that is set via SetCursorCustom.
+	
+	If you specify an invalid value, NspireIO will silenty fail and set the
+	cursor type to 0, a block cursor.
+	
+	You may also use the predefined types as arguments. (NIO_CURSOR_*)
+*/
+void nio_cursor_type(nio_console* c, int cursor_type);
+
+/** Sets the console cursor width.
+	@param c Console
+	@param cursor_width The cursor line width. This only applies to cursors
+	1 and 2 (underscore and vertical bar). All others cursor types will not
+	be affected by this setting.
+	
+	For the underscore cursor, it must be greater than 0 and less than or
+	equal to CHAR_HEIGHT (as defined by	charmap.h). At the time of writing,
+	CHAR_HEIGHT is 8. Therefore, for an underscore cursor,
+	0 < cursor_width <= 8.
+	
+	For a vertical bar cursor, it must be greater than 0 and less than or
+	equal to CHAR_WIDTH (as defined by charmap.h). At the time of writing,
+	CHAR_WIDTH is 6. Therefore, for a vertical bar cursor, 0 < cursor_width < 6.
+	
+	If you wish to draw a blank cursor, you probably should disable the cursor
+	altogether with EnableCursor(nio_console, FALSE).
+	
+	Note that if you specify an out-of-range value, NspireIO will silently fail
+	and reset the cursor width to 1.
+*/
+void nio_cursor_width(nio_console* c, int cursor_width);
+
+/** Sets the console cursor width.
+	@param c Console
+	@param cursor_data The custom cursor data. This is in the form of a char[6]
+	array. This pretty much uses the format (and the drawing code) for character
+	drawing, so take a look at charmap.h for examples. Note that the characters
+	in charmap.h are truncated, so they will display differently.
+	
+	By default, if this is not specified and the cursor type is set to the
+	custom cursor type (3), the custom cursor will be set to
+	{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF} (a block cursor).
+*/
+void nio_cursor_custom(nio_console* c, unsigned char cursor_data[6]);
+
+#ifdef NIO_KEEP_COMPATIBILITY
+#define nio_InitConsole(a,b,c,d,e,f,g)  nio_init(a,b,c,d,e,f,g,TRUE)
+#define nio_DrawConsole                 nio_fflush
+#define nio_Clear                       nio_clear
+#define nio_PrintChar(a,b)              nio_fputc(b,a)
+#define nio_EnableDrawing               nio_drawing_enabled
+#define nio_PrintStr(a,b)               nio_fputs(b,a)
+#define nio_GetChar                     nio_fgetc
+#define nio_GetStr(a,b)                 nio_fgets(b,1000,a)
+#define nio_SetColor                    nio_color
+#define nio_CleanUp                     nio_free
+#define setPixel                        nio_pixel_set
+#define putChar                         nio_pixel_putc
+#define putStr                          nio_pixel_puts
+#define setPixelVRAM                    nio_vram_pixel_set
+#define putCharVRAM                     nio_vram_pixel_putc
+#define putStrVRAM                      nio_vram_pixel_puts
+#define nio_drawstr                     nio_grid_puts
+#define nio_drawch                      nio_grid_putc
+#define nio_ScrollDown                  nio_scroll
+#define nio_DrawChar                    nio_csl_drawchar
+#define nio_DrawCharVRAM                nio_vram_csl_drawchar
+#define nio_SetChar                     nio_csl_savechar
+#define nio_printf                      nio_fprintf
+
+#define uart_putc                       uart_putchar
+#define uart_getc                       uart_getchar
+
+#define get_current_time				nio_time_get
+#define nio_DrawCursor					nio_cursor_draw
+#define nio_EraseCursor					nio_cursor_erase
+#define nio_DrawBlinkingCursor			nio_cursor_blinking_draw
+#define nio_ResetBlinkingCursor			nio_cursor_blinking_reset
+#define nio_EnableCursor				nio_cursor_enable
+#define nio_EnableCursorBlink			nio_cursor_blinking_enable
+#define nio_SetCursorBlinkDuration		nio_cursor_blinking_duration
+#define nio_SetCursorType				nio_cursor_type
+#define nio_SetCursorWidth				nio_cursor_width
+#define nio_SetCursorCustom				nio_cursor_custom
+#endif
+
+#ifdef NIO_REPLACE_STDIO
+#define putchar                         nio_putchar
+#define puts                            nio_puts
+#define getchar                         nio_getchar
+#define gets                            nio_gets
+#define printf                          nio_printf
+#define perror                          nio_perror
+#endif
+
+#ifdef UART_REPLACE_STDIO
+#define putchar                         uart_putchar
+#define puts                            uart_puts
+#define getchar                         uart_getchar
+#define gets                            uart_gets
+#define printf                          uart_printf
+#endif
 
 #endif
